@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+int main() {
+    char keyword[] = "CIPHER";
+    char plaintext[] = "HELLO";
+    char ciphertext[100];
+    char mapping[26];
+    int i, j, k = 0;
+
+    for (i = 0; i < strlen(keyword); i++) {
+        mapping[k++] = toupper(keyword[i]);
+    }
+
+    for (i = 'A'; i <= 'Z'; i++) {
+        if (strchr(keyword, toupper(i)) == NULL) {
+            mapping[k++] = i;
+        }
+    }
+
+    for (i = 0; i < strlen(plaintext); i++) {
+        if (isalpha(plaintext[i])) {
+            if (islower(plaintext[i])) {
+                ciphertext[i] = tolower(mapping[plaintext[i] - 'a']);
+            } else {
+                ciphertext[i] = mapping[plaintext[i] - 'A'];
+            }
+        } else {
+            ciphertext[i] = plaintext[i];
+        }
+    }
+    ciphertext[i] = '\0';
+
+
+    printf("Mapping:\n");
+    for (i = 0; i < 26; i++) {
+        printf("%c ", mapping[i]);
+    }
+    printf("\n");
+
+    printf("Plaintext: %s\n", plaintext);
+    printf("Ciphertext: %s\n", ciphertext);
+
+    return 0;
+}
