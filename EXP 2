@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define KEY_SIZE 8
+void generateSubKeys(unsigned char *key, unsigned char subKeys[16][6]);
+void printSubKeys(unsigned char subKeys[16][6]);
+void circularLeftShift(unsigned char *halfKey, int shiftAmount) {
+    unsigned char carry = 0;
+    for (int i = 0; i < shiftAmount; ++i) {
+        carry = (halfKey[0] & 0x80) >> 3;
+        for (int j = 0; j < 3; ++j) {
+            halfKey[j] = (halfKey[j] << 1) | ((halfKey[j + 1] & 0x80) >> 7);
+        }
+        halfKey[3] = (halfKey[3] << 1) | carry;
+    }
+}
+void generateSubKeys(unsigned char *key, unsigned char subKeys[16][6]) {
+    unsigned char leftHalfKey[4], rightHalfKey[4];
+    for (int i = 0; i < 4; ++i) {
+        leftHalfKey[i] = key[i];
+        rightHalfKey[i] = key[i + 4];
+    }
+    int shiftSchedule[] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+    for (int round = 0; round < 16; ++round) {
+        circularLeftShift(leftHalfKey, shiftSchedule[round]);
+        circularLeftShift(rightHalfKey, shiftSchedule[round]);
+        unsigned char combinedKey[6];
+        for (int i = 0; i < 3; ++i) {
+            combinedKey[i] = (leftHalfKey[i] & 0xFC) | ((rightHalfKey[i] & 0xFC) >> 4);
+        }
+        combinedKey[3] = ((leftHalfKey[3] & 0xF0) >> 4) | ((rightHalfKey[3] & 0xF0) >> 8);
+
+        for (int i = 0; i < 6; ++i) {
+            subKeys[round][i] = combinedKey[i];
+        }
+    }
+}
+void printSubKeys(unsigned char subKeys[16][6]) {
+    printf("Subkeys:\n");
+    for (int i = 0; i < 16; ++i) {
+        printf("K%d: ", i + 1);
+        for (int j = 0; j < 6; ++j) {
+            printf("%02X ", subKeys[i][j]);
+        }
+        printf("\n");
+    }
+}
+int main() {
+    unsigned char key[KEY_SIZE] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
+    unsigned char subKeys[16][6];
+
+    generateSubKeys(key, subKeys);
+    printSubKeys(subKeys);
+
+    return 0;
+}
