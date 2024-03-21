@@ -1,0 +1,49 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int mod_exp(int base, int exponent, int modulus) {
+    int result = 1;
+    base = base % modulus;
+    while (exponent > 0) {
+        if (exponent % 2 == 1)
+            result = (result * base) % modulus;
+        exponent = exponent >> 1;
+        base = (base * base) % modulus;
+    }
+    return result;
+}
+
+int main() {
+    int p, g, a, b;
+    
+    // Publicly agreed prime modulus and base
+    printf("Enter the prime modulus (p): ");
+    scanf("%d", &p);
+    printf("Enter the base (g): ");
+    scanf("%d", &g);
+    
+    // Private keys for Alice and Bob
+    printf("Enter Alice's private key (a): ");
+    scanf("%d", &a);
+    printf("Enter Bob's private key (b): ");
+    scanf("%d", &b);
+    
+    // Calculate public keys for Alice and Bob
+    int A = mod_exp(g, a, p); // A = g^a mod p
+    int B = mod_exp(g, b, p); // B = g^b mod p
+    
+    // Exchange public keys
+    printf("\nPublic keys exchanged:\n");
+    printf("Alice sends: %d\n", A);
+    printf("Bob sends: %d\n\n", B);
+    
+    // Calculate shared secret
+    int secret1 = mod_exp(B, a, p); // Alice computes shared secret
+    int secret2 = mod_exp(A, b, p); // Bob computes shared secret
+    
+    printf("Shared secret calculated by Alice: %d\n", secret1);
+    printf("Shared secret calculated by Bob: %d\n", secret2);
+    
+    return 0;
+}
