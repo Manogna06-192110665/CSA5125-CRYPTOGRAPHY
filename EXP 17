@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Function prototypes
+void decryptDES(unsigned char *cipherText, unsigned char *key);
+void generateKeys(unsigned char *key);
+
+// Example initial permutation and inverse permutation functions
+void initialPermutation(unsigned char *block) {
+    // Your implementation
+}
+
+void inversePermutation(unsigned char *block) {
+    // Your implementation
+}
+
+// Example S-box substitution and permutation functions
+void sBoxSubstitution(unsigned char *block) {
+    // Your implementation
+}
+
+void permutation(unsigned char *block) {
+    // Your implementation
+}
+
+// DES decryption function
+void decryptDES(unsigned char *cipherText, unsigned char *key) {
+    unsigned char subKeys[16][6];
+    generateKeys(key); // Generate keys in reverse order
+
+    // Perform initial permutation on ciphertext
+    initialPermutation(cipherText);
+
+    // Perform 16 rounds of DES decryption
+    for (int round = 15; round >= 0; --round) {
+        // Perform round function (including S-box substitution and permutation)
+        // using subKeys[round]
+        // Your implementation
+
+        // Example:
+        // sBoxSubstitution(cipherText);
+        // permutation(cipherText);
+    }
+
+    // Swap left and right halves
+    // Your implementation
+
+    // Perform inverse permutation
+    inversePermutation(cipherText);
+}
+
+// Function to generate subkeys in reverse order
+void generateKeys(unsigned char *key) {
+    // Your implementation
+}
+
+int main() {
+    unsigned char cipherText[8] = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
+    unsigned char key[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef};
+
+    decryptDES(cipherText, key);
+
+    printf("Decrypted Text: ");
+    for (int i = 0; i < 8; ++i) {
+        printf("%02X ", cipherText[i]);
+    }
+    printf("\n");
+
+    return 0;
+} 
