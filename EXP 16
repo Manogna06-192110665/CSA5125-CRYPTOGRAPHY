@@ -1,0 +1,63 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to count the frequency of letters in the given text
+void countFrequency(const char *text, int *frequency) {
+    int i;
+    for (i = 0; text[i] != '\0'; i++) {
+        if (isalpha(text[i])) {
+            frequency[tolower(text[i]) - 'a']++;
+        }
+    }
+}
+
+// Function to perform letter frequency attack and display top possible plaintexts
+void performFrequencyAttack(const char *ciphertext, int top_plaintexts) {
+    int frequency[ALPHABET_SIZE] = {0};
+    countFrequency(ciphertext, frequency);
+
+    int max_index;
+    int plaintext_score[ALPHABET_SIZE];
+    char plaintext[strlen(ciphertext) + 1];
+
+    printf("Top %d possible plaintexts:\n", top_plaintexts);
+    for (int i = 0; i < top_plaintexts; i++) {
+        max_index = 0;
+        // Find the most frequent letter in the ciphertext
+        for (int j = 1; j < ALPHABET_SIZE; j++) {
+            if (frequency[j] > frequency[max_index]) {
+                max_index = j;
+            }
+        }
+        // Deduce the most likely substitution from 'e'
+        int key = (max_index + ALPHABET_SIZE - ('e' - 'a')) % ALPHABET_SIZE;
+        // Decrypt the ciphertext using the key
+        for (int k = 0; ciphertext[k] != '\0'; k++) {
+            if (isalpha(ciphertext[k])) {
+                plaintext[k] = 'a' + ((tolower(ciphertext[k]) - 'a' + key) % ALPHABET_SIZE);
+            } else {
+                plaintext[k] = ciphertext[k];
+            }
+        }
+        plaintext[strlen(ciphertext)] = '\0';
+        plaintext_score[i] = frequency[max_index];
+        frequency[max_index] = 0; 
+        printf("%d. %s\n", i + 1, plaintext);
+    }
+}
+
+int main() {
+    char ciphertext[] = "Khoor zruog phwdo";
+    int top_plaintexts = 10;
+
+    printf("Ciphertext: %s\n", ciphertext);
+    printf("\nPerforming frequency attack...\n\n");
+
+    performFrequencyAttack(ciphertext, top_plaintexts);
+
+    return 0;
+}
