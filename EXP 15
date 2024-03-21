@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+#define ALPHABET_SIZE 26
+
+// Function to count the frequency of letters in the given text
+void countFrequency(const char *text, int *frequency) {
+    int i;
+    for (i = 0; text[i] != '\0'; i++) {
+        if (isalpha(text[i])) {
+            frequency[tolower(text[i]) - 'a']++;
+        }
+    }
+}
+
+// Function to perform additive decryption
+void decryptAdditive(const char *ciphertext, int key, char *plaintext) {
+    int i;
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            char decrypted_char = tolower(ciphertext[i]) - key;
+            if (decrypted_char < 'a') {
+                decrypted_char += ALPHABET_SIZE;
+            }
+            plaintext[i] = decrypted_char;
+        } else {
+            plaintext[i] = ciphertext[i];
+        }
+    }
+    plaintext[i] = '\0';
+}
+
+// Function to find the index of the maximum value in an array
+int findMaxIndex(int *array, int size) {
+    int max_index = 0;
+    int max_value = array[0];
+    int i;
+    for (i = 1; i < size; i++) {
+        if (array[i] > max_value) {
+            max_value = array[i];
+            max_index = i;
+        }
+    }
+    return max_index;
+}
+
+// Function to perform letter frequency attack and display top possible plaintexts
+void performFrequencyAttack(const char *ciphertext, int top_plaintexts) {
+    int frequency[ALPHABET_SIZE] = {0};
+    countFrequency(ciphertext, frequency);
+
+    int max_index = findMaxIndex(frequency, ALPHABET_SIZE);
+    int key = (max_index + ALPHABET_SIZE - ('e' - 'a')) % ALPHABET_SIZE;
+
+    printf("Most frequent letter in the ciphertext: '%c'\n", 'a' + max_index);
+    printf("Assuming it corresponds to 'e' in plaintext, the key is: %d\n", key);
+
+    printf("\nTop %d possible plaintexts:\n", top_plaintexts);
+    for (int i = 0; i < top_plaintexts; i++) {
+        char plaintext[strlen(ciphertext) + 1];
+        decryptAdditive(ciphertext, (key + i) % ALPHABET_SIZE, plaintext);
+        printf("%d. %s\n", i + 1, plaintext);
+    }
+}
+
+int main() {
+    char ciphertext[] = "Khoor zruog phwdo";
+    int top_plaintexts = 10;
+
+    printf("Ciphertext: %s\n", ciphertext);
+    printf("\nPerforming frequency attack...\n\n");
+
+    performFrequencyAttack(ciphertext, top_plaintexts);
+
+    return 0;
+}
