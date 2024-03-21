@@ -1,0 +1,19 @@
+ #include <stdio.h>
+#include <math.h>
+
+int main() {
+   
+    double total_possible_keys = tgamma(26); 
+
+    
+    double effectively_unique_keys = total_possible_keys / (tgamma(6) * 2); 
+
+    
+    double total_power_of_2 = log2(total_possible_keys);
+    double effective_power_of_2 = log2(effectively_unique_keys);
+
+    printf("Total possible keys: Approximately 2^%.2f\n", total_power_of_2);
+    printf("Effectively unique keys: Approximately 2^%.2f\n", effective_power_of_2);
+
+    return 0;
+}
