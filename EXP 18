@@ -1,0 +1,76 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define KEY_SIZE 8
+
+// Function prototypes
+void generateSubKeys(unsigned char *key, unsigned char subKeys[16][6]);
+void printSubKeys(unsigned char subKeys[16][6]);
+
+// Function to perform circular left shift on a 28-bit half-key
+void circularLeftShift(unsigned char *halfKey, int shiftAmount) {
+    unsigned char carry = 0;
+    for (int i = 0; i < shiftAmount; ++i) {
+        carry = (halfKey[0] & 0x80) >> 3;
+        for (int j = 0; j < 3; ++j) {
+            halfKey[j] = (halfKey[j] << 1) | ((halfKey[j + 1] & 0x80) >> 7);
+        }
+        halfKey[3] = (halfKey[3] << 1) | carry;
+    }
+}
+
+// Function to generate subkeys
+void generateSubKeys(unsigned char *key, unsigned char subKeys[16][6]) {
+    // Initial key permutation goes here (if necessary)
+
+    // Split the 56-bit key into two 28-bit halves
+    unsigned char leftHalfKey[4], rightHalfKey[4];
+    for (int i = 0; i < 4; ++i) {
+        leftHalfKey[i] = key[i];
+        rightHalfKey[i] = key[i + 4];
+    }
+
+    // Define the shift schedule for each round
+    int shiftSchedule[] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+
+    // Generate 16 subkeys
+    for (int round = 0; round < 16; ++round) {
+        // Perform circular left shifts on both halves according to the schedule
+        circularLeftShift(leftHalfKey, shiftSchedule[round]);
+        circularLeftShift(rightHalfKey, shiftSchedule[round]);
+
+        // Combine the two halves and perform a permutation to generate the subkey
+        unsigned char combinedKey[6];
+        for (int i = 0; i < 3; ++i) {
+            combinedKey[i] = (leftHalfKey[i] & 0xFC) | ((rightHalfKey[i] & 0xFC) >> 4);
+        }
+        combinedKey[3] = ((leftHalfKey[3] & 0xF0) >> 4) | ((rightHalfKey[3] & 0xF0) >> 8);
+
+        // Store the subkey
+        for (int i = 0; i < 6; ++i) {
+            subKeys[round][i] = combinedKey[i];
+        }
+    }
+}
+
+// Function to print subkeys for verification
+void printSubKeys(unsigned char subKeys[16][6]) {
+    printf("Subkeys:\n");
+    for (int i = 0; i < 16; ++i) {
+        printf("K%d: ", i + 1);
+        for (int j = 0; j < 6; ++j) {
+            printf("%02X ", subKeys[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    unsigned char key[KEY_SIZE] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
+    unsigned char subKeys[16][6];
+
+    generateSubKeys(key, subKeys);
+    printSubKeys(subKeys);
+
+    return 0;
+}
