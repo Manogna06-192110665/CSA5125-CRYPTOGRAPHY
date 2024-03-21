@@ -1,0 +1,69 @@
+ #include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+
+int gcd(int a, int b) {
+    if (b == 0)
+        return a;
+    return gcd(b, a % b);
+}
+
+
+void generate_keys(int *e, int *d, int *n) {
+    int p, q, phi, publicKey, privateKey;
+
+    
+    p = 61;  
+    q = 53;
+
+    
+    *n = p * q;
+
+    
+    phi = (p - 1) * (q - 1);
+
+    // Step 4: Choose e such that 1 < e < phi and gcd(e, phi) = 1
+    publicKey = 17;  // Example public key, should be chosen randomly
+
+    // Step 5: Calculate d such that d * e = 1 (mod phi)
+    // We can use Extended Euclidean Algorithm to find d
+    int k = 1;
+    while (1) {
+        privateKey = (k * phi + 1) / publicKey;
+        if (gcd(privateKey, phi) == 1) {
+            *e = publicKey;
+            *d = privateKey;
+            break;
+        }
+        k++;
+    }
+}
+
+// Function to encrypt message
+int encrypt(int message, int e, int n) {
+    return fmod(pow(message, e), n);
+}
+
+// Function to decrypt message
+int decrypt(int message, int d, int n) {
+    return fmod(pow(message, d), n);
+}
+
+int main() {
+    int e, d, n;
+    generate_keys(&e, &d, &n);
+
+    // Example message to be encrypted
+    int message = 123;
+
+    // Encrypt the message
+    int encrypted_message = encrypt(message, e, n);
+    printf("Encrypted message: %d\n", encrypted_message);
+
+    // Decrypt the message
+    int decrypted_message = decrypt(encrypted_message, d, n);
+    printf("Decrypted message: %d\n", decrypted_message);
+
+    return 0;
+}
