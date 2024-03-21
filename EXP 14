@@ -1,0 +1,65 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <string.h>
+#define ALPHABET_SIZE 26
+void encryptVigenere(char *plaintext, int *keystream) {
+    int i = 0;
+    int key_len = strlen(plaintext);
+    
+    for (i = 0; i < key_len; i++) {
+       
+        char ch = toupper(plaintext[i]);
+      
+        if (isalpha(ch)) {
+            
+            int shift = keystream[i] % ALPHABET_SIZE;
+         
+            if (isupper(ch)) {
+                ch = ((ch - 'A' + shift) % ALPHABET_SIZE) + 'A';
+            } else {
+                ch = ((ch - 'a' + shift) % ALPHABET_SIZE) + 'a';
+            }
+        }
+   
+        printf("%c", ch);
+    }
+    printf("\n");
+}
+
+void decryptVigenere(char *ciphertext, int *keystream) {
+    int i = 0;
+    int key_len = strlen(ciphertext);
+   
+    for (i = 0; i < key_len; i++) {
+       
+        char ch = toupper(ciphertext[i]);
+       
+        if (isalpha(ch)) {
+           
+            int shift = keystream[i] % ALPHABET_SIZE;
+          
+            if (isupper(ch)) {
+                ch = ((ch - 'A' - shift + ALPHABET_SIZE) % ALPHABET_SIZE) + 'A';
+            } else {
+                ch = ((ch - 'a' - shift + ALPHABET_SIZE) % ALPHABET_SIZE) + 'a';
+            }
+        }
+
+        printf("%c", ch);
+    }
+    printf("\n");
+}
+
+int main() {
+    char plaintext[] = "sendmoremoney";
+    int keystream[] = {9, 0, 1, 7, 23, 15, 21, 14, 11, 11, 2, 8, 9};
+    char ciphertext[strlen(plaintext)];
+    printf("Plaintext: %s\n", plaintext);
+    printf("Ciphertext: ");
+    encryptVigenere(plaintext, keystream);
+    printf("Decrypted Ciphertext: ");
+    decryptVigenere("cftwzojvbdfni", keystream);
+
+    return 0;
+}
