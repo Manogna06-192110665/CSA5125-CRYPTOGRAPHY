@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <string.h>
+
+#define SIZE 2
+void matrixMultiply(int key[SIZE][SIZE], int message[SIZE], int result[SIZE]) {
+    int i, j;
+
+    for (i = 0; i < SIZE; i++) {
+        result[i] = 0;
+        for (j = 0; j < SIZE; j++) {
+            result[i] += key[i][j] * message[j];
+        }
+    }
+}
+void encryptMessage(char *plaintext, int key[SIZE][SIZE]) {
+    int len = strlen(plaintext);
+    int i, j;
+    int message[SIZE];
+    int result[SIZE];
+
+    printf("Encrypted Message: ");
+    for (i = 0; i < len; i += 2) {
+        message[0] = plaintext[i] - 'a';
+        message[1] = plaintext[i + 1] - 'a';
+
+        matrixMultiply(key, message, result);
+
+        // Convert the result to letters
+        for (j = 0; j < SIZE; j++) {
+            printf("%c", (result[j] % 26) + 'a');
+        }
+    }
+    printf("\n");
+}
+
+
+void decryptMessage(int ciphertext[SIZE], int key[SIZE][SIZE]) {
+    int i, j;
+    int result[SIZE];
+
+    printf("Decrypted Message: ");
+
+    // Iterate through the ciphertext and decrypt each pair of characters
+    for (i = 0; i < SIZE; i++) {
+        for (j = 0; j < SIZE; j++) {
+            result[j] = (ciphertext[i] * key[j][i]) % 26;
+        }
+
+        // Convert the result to letters
+        for (j = 0; j < SIZE; j++) {
+            printf("%c", result[j] + 'a');
+        }
+    }
+    printf("\n");
+}
+
+int main() {
+    int key[SIZE][SIZE] = {{9, 4}, {5, 7}};
+    char plaintext[] = "meetmeattheusualplaceattenratherthaneightoclock";
+    int ciphertext[strlen(plaintext)];
+
+    printf("Original Message: %s\n", plaintext);
+
+    
+    encryptMessage(plaintext, key);
+
+   
+    decryptMessage(ciphertext, key);
+
+    return 0;
+}
