@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define BLOCK_SIZE 16
+
+// Function to perform ECB mode encryption
+void ecb_encrypt(char *plaintext, char *key, char *ciphertext, int text_length) {
+    int i, j;
+    for (i = 0; i < text_length; i += BLOCK_SIZE) {
+        // Perform encryption on each block independently
+        for (j = 0; j < BLOCK_SIZE; j++) {
+            ciphertext[i + j] = plaintext[i + j] ^ key[j]; // simple XOR for demonstration
+        }
+    }
+}
+
+// Function to perform ECB mode decryption
+void ecb_decrypt(char *ciphertext, char *key, char *plaintext, int text_length) {
+    int i, j;
+    for (i = 0; i < text_length; i += BLOCK_SIZE) {
+        // Perform decryption on each block independently
+        for (j = 0; j < BLOCK_SIZE; j++) {
+            plaintext[i + j] = ciphertext[i + j] ^ key[j]; // simple XOR for demonstration
+        }
+    }
+}
+
+int main() {
+    char plaintext[] = "This is a secret message"; // Example plaintext
+    char key[BLOCK_SIZE] = "secretkey"; // Example key
+    int text_length = strlen(plaintext);
+
+    // Ensure the plaintext length is a multiple of the block size
+    int padding = BLOCK_SIZE - (text_length % BLOCK_SIZE);
+    if (padding != BLOCK_SIZE) {
+        text_length += padding;
+        memset(plaintext + strlen(plaintext), padding, padding);
+    }
+
+    char ciphertext[text_length];
+    char decrypted_text[text_length];
+
+    // Encrypt the plaintext using ECB mode
+    ecb_encrypt(plaintext, key, ciphertext, text_length);
+    
+    // Decrypt the ciphertext using ECB mode
+    ecb_decrypt(ciphertext, key, decrypted_text, text_length);
+
+    printf("Plaintext: %s\n", plaintext);
+    printf("Ciphertext: ");
+    for (int i = 0; i < text_length; i++) {
+        printf("%02x", ciphertext[i]);
+    }
+    printf("\n");
+
+    printf("Decrypted text: %s\n", decrypted_text);
+
+    return 0;
+}
